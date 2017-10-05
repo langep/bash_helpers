@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Taken from https://dev.to/thiht/shell-scripts-matter 
+# Inspired by https://dev.to/thiht/shell-scripts-matter 
 
 #/ Usage:
 #/ Description:
