@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Inspired by https://dev.to/thiht/shell-scripts-matter 
+# Taken from https://dev.to/thiht/shell-scripts-matter 
 
 #/ Usage:
 #/ Description:
@@ -16,16 +16,28 @@ expr "$*" : ".*--help" > /dev/null && usage
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Import helper functions.
-source utils.sh
+source bash_helpers/utils.sh
 
 cleanup() {
     # Remove temporary files
     # Restart services
     # ...
+    info "Cleanup done."
 }
+
+environment() {
+	# Test for required environment variables.
+	# check_null_or_unset ${MY_VAR} "MY_VAR"
+	# ...
+	info "Environment check passed."
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     trap cleanup EXIT
+    environment
+
     # Script goes here
     # ...
+    info "Script work done."
 fi
