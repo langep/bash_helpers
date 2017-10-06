@@ -22,6 +22,8 @@ check_null_or_unset() {
 	fi
 }
 
+# Check if variable is directory. Abort otherwise.
+# Example: check_file ${MY_VAR} "MY_VAR"
 check_dir() {
 	local readonly path=${1}
 	local readonly var_name=${2}
@@ -31,6 +33,8 @@ check_dir() {
 	fi
 }
 
+# Check if variable is file. Abort otherwise.
+# Example: check_file ${MY_VAR} "MY_VAR"
 check_file() {
 	local readonly path=${1}
 	local readonly var_name=${2}
@@ -38,4 +42,39 @@ check_file() {
 	if [[ ! -f ${path} ]] ; then
 		fatal "${var_name} is not a file."
 	fi
+}
+
+# Set os and ver to distro name and version respectively. 
+set_os_and_ver() {
+    if [ -f /etc/os-release ]; then
+        # freedesktop.org and systemd
+        . /etc/os-release
+        os=$NAME
+        ver=$VERSION_ID
+    elif type lsb_release >/dev/null 2>&1; then
+        # linuxbase.org
+        os=$(lsb_release -si)
+        ver=$(lsb_release -sr)
+    elif [ -f /etc/lsb-release ]; then
+        # For some versions of Debian/Ubuntu without lsb_release command
+        . /etc/lsb-release
+        os=$DISTRIB_ID
+        ver=$DISTRIB_RELEASE
+    elif [ -f /etc/debian_version ]; then
+        # Older Debian/Ubuntu/etc.
+        os=Debian
+        ver=$(cat /etc/debian_version)
+    elif [ -f /etc/SuSe-release ]; then
+        # Older SuSE/etc.
+        os=$(uname -s)
+        ver=$(uname -r)
+    elif [ -f /etc/redhat-release ]; then
+        # Older Red Hat, CentOS, etc.
+        os=$(uname -s)
+        ver=$(uname -r)
+    else
+        # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+        os=$(uname -s)
+        ver=$(uname -r)
+    fi
 }
