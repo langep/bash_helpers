@@ -5,41 +5,81 @@ warning() { echo "[WARNING] $*" | tee -a "$LOG_FILE" >&2 ; }
 error()   { echo "[ERROR]   $*" | tee -a "$LOG_FILE" >&2 ; }
 fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
 
+# Check if command exists
+check_command() {
+    local readonly cmd=${1}
+    type -p ${cmd} > /dev/null
+}
+
+# Abort if check_command test not passed
+require_command() {
+    local readonly cmd=${1}
+    if ! check_command ${cmd}; then
+        fatal "${cmd} could not be found in PATH"
+    fi
+}
+
 # Check if the current user is a root user. Abort otherwise.
 check_root() {
-	if [[ $EUID -ne 0 ]]; then
-   		fatal "This script must be run as root." 
-	fi
+	[[ $EUID -eq 0 ]] 
 }
 
-# Check if variable is set and non-empty. Abort otherwise.
-# Example: check_null_or_unset ${MY_VAR} "MY_VAR"
+# Abort if check_root test not passed.
+require_root() {
+    if ! check_root; then
+        fatal "This script must be run as root."
+    fi
+}
+
+# Check if variable is set and non-empty. 
+# Example: check_null_or_unset ${MY_VAR}
 check_null_or_unset() {
 	local readonly var_val=${1}
-	local readonly var_name=${2}
-	if [[ -z ${var_val:+x} ]] ; then
-		fatal "${var_name} is null or unset."
-	fi
+    [[ -n ${var_val:+x} ]]
 }
 
-# Check if variable is directory. Abort otherwise.
-# Example: check_file ${MY_VAR} "MY_VAR"
+# Abort if check_null_or_unset failed.
+# Example: require_var ${MY_VAR} "MY_VAR"
+require_var() {
+    local readonly var_val=${1}
+    local readonly var_name=${2}
+    if ! check_null_or_unset ${var_val}; then
+        fatal "${var_name} is null or unset."
+    fi
+}
+
+# Check if variable is directory.
+# Example: check_dir ${MY_VAR}
 check_dir() {
 	local readonly path=${1}
-	local readonly var_name=${2}
-	check_null_or_unset ${path} ${var_name}
-	if [[ ! -d ${path} ]] ; then
-		fatal "${var_name} is not a directory."
-	fi
+    [[ -d ${path} ]]
+}
+
+# Abort if check_dir failed. Also runs require_var
+# Example: require_dir ${MY_VAR} "MY_VAR"
+require_dir() {
+    local readonly path=${1}
+    local readonly var_name=${2}
+    require_var ${path} ${var_name}
+    if ! check_dir ${path}; then
+        fatal "${var_name} is not a directory."
+    fi
 }
 
 # Check if variable is file. Abort otherwise.
 # Example: check_file ${MY_VAR} "MY_VAR"
 check_file() {
+    local readonly path=${1}
+    [[ -f ${path} ]]
+}
+
+# Abort if check_file failed. Also runs require_var
+# Example: require_file ${MY_VAR} "MY_VAR"
+require_file() {
 	local readonly path=${1}
 	local readonly var_name=${2}
-	check_null_or_unset ${path} ${var_name}
-	if [[ ! -f ${path} ]] ; then
+    require_var ${path} ${var_name}
+	if ! check_file ${path}; then
 		fatal "${var_name} is not a file."
 	fi
 }
