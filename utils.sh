@@ -11,6 +11,21 @@ fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
 ###
 #   VALIDATION
 ###
+# Check if group exists
+check_group() {
+    local groupname=${1}
+    getent group ${groupname} > /dev/null
+}
+
+# Check if group exists. Abort otherwise.
+require_group() {
+    local groupname=${1}
+    if ! check_group ${groupname}; then
+        fatal "The group '${groupname}' does not exist."
+    fi
+}
+
+
 # Check if user exists
 check_user() {
     local username=${1}
@@ -21,7 +36,7 @@ check_user() {
 require_user() {
     local username=${1}
     if ! check_user ${username}; then
-        fatal "The user ${username} does not exist"
+        fatal "The user '${username}' does not exist."
     fi
 }
 
