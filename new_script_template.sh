@@ -27,7 +27,7 @@ cleanup() {
 
 environment() {
 	# Test for required environment variables.
-	# check_null_or_unset ${MY_VAR} "MY_VAR"
+	# check_null_or_unset ${MY_VAR:-""} "MY_VAR"
 	# ...
 	info "Environment check passed."
 }

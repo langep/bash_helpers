@@ -11,6 +11,20 @@ fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
 ###
 #   VALIDATION
 ###
+# Check if user exists
+check_user() {
+    local username=${1}
+    id -u ${username} > /dev/null
+}
+
+# Check if user exists. Abort otherwise.
+require_user() {
+    local username=${1}
+    if ! check_user ${username}; then
+        fatal "The user ${username} does not exist"
+    fi
+}
+
 # Check if command exists
 check_command() {
     local readonly cmd=${1}
