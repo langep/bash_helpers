@@ -29,7 +29,7 @@ require_group() {
 # Check if user exists
 check_user() {
     local username=${1}
-    id -u ${username} > /dev/null
+    id -u ${username} > /dev/null 2>&1
 }
 
 # Check if user exists. Abort otherwise.
