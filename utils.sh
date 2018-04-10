@@ -69,7 +69,7 @@ require_root() {
 # Check if variable is set and non-empty. 
 # Example: check_null_or_unset ${MY_VAR}
 check_null_or_unset() {
-    local readonly var_val=${1:""}
+    local readonly var_val=${1}
     [[ -n ${var_val:+x} ]]
 }
 
