@@ -78,7 +78,7 @@ check_null_or_unset() {
 require_var() {
     local readonly var_val=${1}
     local readonly var_name=${2}
-    if check_null_or_unset ${var_val}; then
+    if ! check_null_or_unset ${var_val}; then
         fatal "${var_name} is null or unset."
     fi
 }
